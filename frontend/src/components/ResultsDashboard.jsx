@@ -127,7 +127,7 @@ function toBullets(input, { max = 4 } = {}) {
 }
 
 function EmphasisLine({ text }) {
-  const s = truncateLine(text);
+  const s = String(text || "").trim();
   if (!s) return null;
 
   // Bold common action verbs (keeps items readable without over-highlighting)

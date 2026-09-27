@@ -72,7 +72,7 @@ __RESUME_TEXT__
 """
 
 def _gemini_generate_url() -> str:
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
     return (
         f"https://generativelanguage.googleapis.com/v1beta/models/"
         f"{model}:generateContent"
