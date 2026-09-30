@@ -9,18 +9,22 @@ from flask_cors import CORS
 from services.gemini_analyzer import analyze_resume, is_gemini_configured
 from services.pdf_extractor import extract_text_from_pdf
 
+
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_FILE_SIZE = 10 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"pdf"}
 
 
 def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    )
 
 
 @app.route("/api/health", methods=["GET"])
@@ -52,40 +56,46 @@ def analyze():
     resume_file.seek(0, os.SEEK_END)
     size = resume_file.tell()
     resume_file.seek(0)
+
     if size > MAX_FILE_SIZE:
         return jsonify({"error": "File size must be under 10 MB."}), 400
 
     if not is_gemini_configured():
-        return jsonify(
-            {
-                "error": (
-                    "Analysis service is not configured. "
-                    "Please contact your administrator."
-                )
-            }
-        ), 503
+        return jsonify({
+            "error": (
+                "Analysis service is not configured. "
+                "Please contact your administrator."
+            )
+        }), 503
 
     try:
         resume_text = extract_text_from_pdf(resume_file)
+
         if not resume_text:
-            return jsonify(
-                {"error": "Could not extract text from PDF. The file may be scanned or empty."}
-            ), 400
+            return jsonify({
+                "error": (
+                    "Could not extract text from PDF. "
+                    "The file may be scanned or empty."
+                )
+            }), 400
 
         result = analyze_resume(resume_text, job_description)
         return jsonify(result)
 
     except ValueError as e:
+        app.logger.error(f"Analysis ValueError: {e}")
         return jsonify({"error": str(e)}), 400
+
     except json.JSONDecodeError:
-        return jsonify(
-            {"error": "Could not parse AI response. Please try again."}
-        ), 502
+        return jsonify({
+            "error": "Could not parse AI response. Please try again."
+        }), 502
+
     except Exception as e:
         app.logger.exception("Analysis failed")
-        return jsonify(
-            {"error": "Analysis failed unexpectedly. Please try again."}
-        ), 500
+        return jsonify({
+            "error": "Analysis failed unexpectedly. Please try again."
+        }), 500
 
 
 if __name__ == "__main__":

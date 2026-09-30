@@ -73,17 +73,18 @@ export default function App() {
             </div>
 
             {error && (
-              <div className="mb-5 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
-                <div className="flex items-start gap-2.5">
-                  <span className="mt-0.5 font-bold">!</span>
-                  <div className="flex-1">
-                    <p className="font-semibold">Couldn’t complete analysis</p>
-                    <p className="mt-0.5 text-rose-700">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
+  <div className="mb-5 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
+    <div className="flex items-start gap-2.5">
+      <span className="mt-0.5 font-bold">!</span>
+      <div className="flex-1">
+        <p className="font-semibold">We couldn't complete your analysis right now.</p>
+        <p className="mt-0.5 text-rose-700">
+          Your resume and job description are safe. Please try again in a moment.
+        </p>
+      </div>
+    </div>
+  </div>
+)}
             <button
               onClick={handleAnalyze}
               disabled={!canSubmit}
